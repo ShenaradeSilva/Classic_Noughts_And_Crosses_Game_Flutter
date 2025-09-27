@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import '../logo/logo.dart';
-import 'dart:math';
 
 enum Player { x, o }
 
 class PlayerCard extends StatelessWidget {
   final String name;
   final Player symbol;
+  final bool isSmall;
 
-  const PlayerCard({super.key, required this.name, required this.symbol});
+  const PlayerCard({
+    super.key, 
+    required this.name, 
+    required this.symbol,
+    this.isSmall = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmall ? 6 : 8, 
+        vertical: isSmall ? 2 : 4
+      ),
       decoration: BoxDecoration(
         color: Colors.white24,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isSmall ? 8 : 12),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             symbol.name.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
+              fontSize: isSmall ? 12 : null,
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 4),
           Text(
             name,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w500,
               color: Colors.white,
+              fontSize: isSmall ? 12 : null,
             ),
           ),
         ],
@@ -136,139 +147,147 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  Widget _buildAppBarPlayerWidget() {
+    if (widget.playerName.isNotEmpty) {
+      return PlayerCard(
+        name: widget.playerName,
+        symbol: widget.playerSymbol,
+        isSmall: true,
+      );
+    } else {
+      return Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Icon(
+          Icons.person,
+          color: Colors.white,
+          size: 20,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 237, 42, 247),
-              Color.fromARGB(255, 97, 0, 89),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Top bar: Back button | Logo + text | Player card
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top bar with purple[700] background
+            Container(
+              color: Colors.purple[700],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Back button
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-
-                    // Logo + text
+                    // Back button and Logo
                     Row(
                       children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
                         SizedBox(
                           height: 40,
                           width: 40,
                           child: TicTacToeLogo(size: 40),
                         ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Tic Tac Toe Game',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
                       ],
                     ),
 
-                    // Player card
-                    PlayerCard(
-                      name: widget.playerName,
-                      symbol: widget.playerSymbol,
-                    ),
-                  ],
-                ),
-              ),
+                    const Spacer(),
 
-              const SizedBox(height: 10),
-
-              // Player info
-              Text(
-                '${widget.playerName} vs AI (${widget.difficulty})',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-
-              // Center grid
-              Expanded(
-                child: Center(
-                  child: SizedBox(
-                    width: 300,
-                    height: 300,
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 1,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                      ),
-                      itemCount: 9,
-                      itemBuilder: (context, index) => _buildCell(index),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Result & Restart button
-              if (gameOver)
-                Column(
-                  children: [
-                    Text(
-                      resultMessage,
-                      style: const TextStyle(
-                        fontSize: 24,
+                    const Text(
+                      'Tic Tac Toe Game',
+                      style: TextStyle(
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: _resetGame,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.purple,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Restart',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+
+                    const Spacer(),
+
+                    _buildAppBarPlayerWidget(),
                   ],
                 ),
-            ],
-          ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Player info
+            Text(
+              '${widget.playerName.isNotEmpty ? widget.playerName : 'Player'} vs AI (${widget.difficulty})',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+
+            // Center grid
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: 9,
+                    itemBuilder: (context, index) => _buildCell(index),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Result & Restart button
+            if (gameOver)
+              Column(
+                children: [
+                  Text(
+                    resultMessage,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _resetGame,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.purple,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Restart',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+          ],
         ),
       ),
     );

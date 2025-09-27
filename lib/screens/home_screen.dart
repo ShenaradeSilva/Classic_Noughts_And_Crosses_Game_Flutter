@@ -197,6 +197,9 @@ class _HomePageState extends State<HomePage> {
                     onChanged: (value) =>
                         setState(() => _selectedDifficulty = value),
                     style: const TextStyle(color: Colors.white),
+                    // Add these properties for white dropdown arrow
+                    icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                    iconSize: 30,
                   ),
                 ),
                 const SizedBox(height: 20),
