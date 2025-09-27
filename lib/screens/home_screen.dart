@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../logo/logo.dart';
 import 'profile_card_field.dart';
+import 'game_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,10 +41,11 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                      color: _selectedProfile == null
-                          ? Colors.yellow
-                          : Colors.transparent,
-                      width: 3),
+                    color: _selectedProfile == null
+                        ? Colors.yellow
+                        : Colors.transparent,
+                    width: 3,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: const EdgeInsets.all(8),
@@ -70,8 +72,9 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                        color: isSelected ? Colors.yellow : Colors.transparent,
-                        width: 3),
+                      color: isSelected ? Colors.yellow : Colors.transparent,
+                      width: 3,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(8),
@@ -143,13 +146,20 @@ class _HomePageState extends State<HomePage> {
                 ElevatedButton(
                   onPressed: () => setState(() => _showGameSetup = true),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.purple,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: const Text('Get Started', style: TextStyle(fontSize: 16)),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.purple,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 25,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Get Started',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
 
               if (_showGameSetup) ...[
@@ -184,15 +194,17 @@ class _HomePageState extends State<HomePage> {
                       DropdownMenuItem(value: 'medium', child: Text('Medium')),
                       DropdownMenuItem(value: 'hard', child: Text('Hard')),
                     ],
-                    onChanged: (value) => setState(() => _selectedDifficulty = value),
+                    onChanged: (value) =>
+                        setState(() => _selectedDifficulty = value),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 20),
 
                 ElevatedButton(
-                  onPressed: () {
-                    if (_nameController.text.isEmpty || _selectedDifficulty == null) {
+                  onPressed: () async {
+                    if (_nameController.text.isEmpty ||
+                        _selectedDifficulty == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
@@ -202,18 +214,79 @@ class _HomePageState extends State<HomePage> {
                       );
                       return;
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Player: ${_nameController.text}, Difficulty: $_selectedDifficulty, Profile Card: ${_selectedProfile ?? "None"}',
+
+                    // Let player choose X or O
+                    Player? chosenSymbol = await showDialog<Player>(
+                      context: context,
+                      builder: (context) => Dialog(
+                        backgroundColor: Colors.purple[700],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Choose your symbol',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.purple,
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.pop(context, Player.x),
+                                    child: const Text('X'),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.purple,
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.pop(context, Player.o),
+                                    child: const Text('O'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
+
+                    if (chosenSymbol != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameScreen(
+                            playerSymbol: chosenSymbol,
+                            playerName: _nameController.text,
+                            difficulty: _selectedDifficulty!,
+                          ),
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.purple,
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 25,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

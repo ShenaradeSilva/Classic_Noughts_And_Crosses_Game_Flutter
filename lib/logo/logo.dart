@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class TicTacToeLogo extends StatelessWidget {
-  const TicTacToeLogo({super.key});
+  final double size; // Add a size parameter
+  const TicTacToeLogo({super.key, this.size = 150});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(150, 150),
-      painter: _TicTacToePainter(),
-    );
+    return CustomPaint(size: Size(size, size), painter: _TicTacToePainter());
   }
 }
 
@@ -26,7 +24,7 @@ class _TicTacToePainter extends CustomPainter {
     canvas.drawCircle(center, radius, paint);
 
     // Shrink grid to fit inside circle with padding
-    final double padding = 20; // margin inside circle
+    final double padding = size.width * 0.13; // proportional padding
     final double gridSize = size.width - (padding * 2);
     final double third = gridSize / 3;
 
@@ -50,21 +48,23 @@ class _TicTacToePainter extends CustomPainter {
     }
 
     // X in top-left
+    final double xPadding = third * 0.3; // bigger padding
     canvas.drawLine(
-      Offset(startX + 10, startY + 10),
-      Offset(startX + third - 10, startY + third - 10),
+      Offset(startX + xPadding, startY + xPadding),
+      Offset(startX + third - xPadding, startY + third - xPadding),
       paint,
     );
     canvas.drawLine(
-      Offset(startX + third - 10, startY + 10),
-      Offset(startX + 10, startY + third - 10),
+      Offset(startX + third - xPadding, startY + xPadding),
+      Offset(startX + xPadding, startY + third - xPadding),
       paint,
     );
 
     // O in bottom-right
+    final double oRadius = (third / 2) - (third * 0.3); // smaller than before
     canvas.drawCircle(
       Offset(startX + third * 2 + third / 2, startY + third * 2 + third / 2),
-      third / 2 - 10,
+      oRadius,
       paint,
     );
   }
