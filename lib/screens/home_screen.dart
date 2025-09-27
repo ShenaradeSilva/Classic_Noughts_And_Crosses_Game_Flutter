@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../logo/logo.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -21,16 +22,8 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                'assets/tic_tac_toe.png',
-                width: 150,
-                height: 150,
-              ),
-            ),
-            const SizedBox(height: 32),
+            const TicTacToeLogo(),
+            const SizedBox(height: 60),
             ElevatedButton(
               onPressed: () {
                 // Navigate to your GameScreen here later
@@ -39,11 +32,17 @@ class HomePage extends StatelessWidget {
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.purple,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 64,
-                  vertical: 16,
+                  horizontal: 25, // smaller width
+                  vertical: 12,  // smaller height
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Start Game', style: TextStyle(fontSize: 18)),
+              child: const Text(
+                'Start Game',
+                style: TextStyle(fontSize: 16), 
+              ),
             ),
           ],
         ),
